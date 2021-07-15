@@ -13,19 +13,23 @@ object DocumentParser {
   lazy val tag: TutuParser[(Option[String], String)] =  for {
     _ <- string("[")
     prefix <- optional(for {
-      p: String <- regex("[0-9a-zA-Z_]+")
+      p: String <- regex("[^:]+")
       _ <- string(":")
     } yield p)
-    name <- regex("[0-9a-zA-Z_]+")
+    name <- regex("[^]]+")
     _ <- string("]")
   } yield (prefix, name)
 
   lazy val LBrace: TutuParser[String] = string("{")
   lazy val RBrace: TutuParser[String] = string("}")
 
+  lazy val line: TutuParser[String] = regex("[^\r\n]*[\r\n]+")
+
   lazy val element: TutuParser[Ast.Element] = for {
+    _ <- wspaces
     (prefix, name) <- tag
-    _ <- LBrace
+    _ <- LBrace ~ wspaces
+    body <- line.many1()
     _ <- RBrace
-  } yield Ast.Element(prefix, name, "")
+  } yield Ast.Element(prefix, name, body.foldl((a: String, b: String) => a + b.stripTrailing(), ""))
 }

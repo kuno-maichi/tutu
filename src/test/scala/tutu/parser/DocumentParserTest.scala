@@ -7,9 +7,12 @@ import org.scalatest.funsuite.AnyFunSuite
 class DocumentParserTest extends AnyFunSuite with Diagrams {
   test("one element ") {
     val elementParser: TutuParser[Ast.Element] = DocumentParser.element
-    val element = elementParser.parse(Input.of("[narou:abstract]{}")).getResult
-    assert(element.prefix == Some("narou"))
-    assert(element.name == "abstract")
-    assert(element.body == "")
+    val element = elementParser.parse(Input.of("""
+[なろう:あらすじ]{
+これはあらすじです。
+}""")).getResult
+    assert(element.prefix == Some("なろう"))
+    assert(element.name == "あらすじ")
+    assert(element.body == "これはあらすじです。")
   }
 }
