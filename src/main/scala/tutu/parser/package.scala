@@ -2,9 +2,10 @@ package tutu
 import org.javafp.parsecj._
 import org.javafp.parsecj.Combinators._
 import org.javafp.parsecj.input.Input
+import org.javafp.parsecj.Text
 
 package object parser {
-  type TutuParser[A] = Parser[Input[Char], A]
+  type TutuParser[A] = Parser[Character, A]
   case class ~[A, B](_1: A, _2: B)
   implicit class RichParser[A](self: TutuParser[A]) {
     def flatMap[B](function: A => TutuParser[B]): TutuParser[B] = {
@@ -24,5 +25,6 @@ package object parser {
       )
     }
   }
+  def string(value: String): TutuParser[String] = Text.string(value)
   def success[A](value: A): TutuParser[A] = retn(value)
 }
