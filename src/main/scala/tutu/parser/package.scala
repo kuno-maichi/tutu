@@ -24,4 +24,5 @@ package object parser {
       )
     }
   }
+  def success[A](value: A): TutuParser[A] = retn(value)
 }
