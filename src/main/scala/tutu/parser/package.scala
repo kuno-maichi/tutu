@@ -27,12 +27,12 @@ package object parser {
       )
     }
     def withFilter(predicate: A => Boolean): TutuParser[A] = {
-      self.flatMap(a => if(predicate(a)) self else fail("condition doesn't satisfy"))
+      self.flatMap(a => if(predicate(a)) succeed(a) else fail("condition doesn't satisfy"))
     }
   }
   def literal(value: String): TutuParser[String] = Text.string(value)
   def optional[A >: Null](value: TutuParser[A]): TutuParser[Option[A]] = {
     value.optionalOpt().map[Option[A]]((v: Optional[A]) => Option(v.orElse(null)))
   }
-  def success[A](value: A): TutuParser[A] = retn(value)
+  def succeed[A](value: A): TutuParser[A] = retn(value)
 }
