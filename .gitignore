@@ -1,0 +1,11 @@
+build/
+project/boot
+.bsp/
+target/
+.idea/
+.idea_modules/
+.cache
+.build.sbt.un~
+*.un~
+
+.settings
