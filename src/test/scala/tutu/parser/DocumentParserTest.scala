@@ -5,7 +5,7 @@ import org.scalatest.diagrams.Diagrams
 import org.scalatest.funsuite.AnyFunSuite
 
 class DocumentParserTest extends AnyFunSuite with Diagrams {
-  test("one element ") {
+  test("one element is parsed") {
     val elementParser: TutuParser[Ast.Element] = DocumentParser.element
     val element = elementParser.parse(Input.of("""
 [なろう:あらすじ]{
