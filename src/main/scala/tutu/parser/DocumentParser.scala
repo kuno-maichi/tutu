@@ -1,7 +1,8 @@
 package tutu.parser
 import org.javafp.parsecj.Combinators.attempt
 import org.javafp.parsecj.Text._
-import tutu.parser.Ast.Prefix
+import tutu.parser.Ast.{Prefix, SynopsisTag, UserTag}
+import tutu.parser.DocumentParser.prefix
 
 import java.util.Optional
 
@@ -20,12 +21,21 @@ object DocumentParser {
     _ <- string(":")
   } yield prefixOf(name)
 
-  lazy val tag: TutuParser[(Option[Ast.Prefix], String)] =  for {
+  lazy val userTag: TutuParser[UserTag] =  for {
     _ <- string("[")
     p <- optional(prefix)
     n <- regex("[^]]+")
     _ <- string("]")
-  } yield (p, n)
+  } yield UserTag(p, n)
+
+  lazy val synopsisTag: TutuParser[SynopsisTag] =  for {
+    _ <- string("[")
+    p <- optional(prefix)
+    _ <- regex("synopsis|あらすじ")
+    _ <- string("]")
+  } yield SynopsisTag(p)
+
+  lazy val tag: TutuParser[Ast.Tag] = synopsisTag.map(t => t:Ast.Tag) | userTag.map(t => t: Ast.Tag)
 
   lazy val LBrace: TutuParser[String] = string("{")
   lazy val RBrace: TutuParser[String] = string("}")
@@ -34,9 +44,16 @@ object DocumentParser {
 
   lazy val element: TutuParser[Ast.Element] = for {
     _ <- wspaces
-    (prefix, name) <- tag
+    tag <- tag
     _ <- LBrace ~ wspaces
     body <- line.many1()
     _ <- RBrace
-  } yield Ast.Element(prefix, name, body.foldl((a: String, b: String) => a + b.stripTrailing(), ""))
+  } yield {
+    tag match {
+      case SynopsisTag(prefix) =>
+        Ast.Synopsis(prefix, body.foldl((a: String, b: String) => a + b.trim(), ""))
+      case UserTag(prefix, name) =>
+        Ast.UserElement(prefix, name, body.foldl((a: String, b: String) => a + b.trim(), ""))
+    }
+  }
 }
