@@ -1,27 +1,25 @@
 package tutu.parser
 
-import org.javafp.parsecj.input.Input
+import tutu.combinator._
 import org.scalatest.diagrams.Diagrams
 import org.scalatest.funsuite.AnyFunSuite
 
 class DocumentParserTest extends AnyFunSuite with Diagrams {
-  test("[なろう:あらすじ] is parsed") {
-    val elementParser: TutuParser[Ast.Element] = DocumentParser.element
-    val element = elementParser.parse(Input.of("""
+  test("[なろう:あらすじ] が解析可能") {
+    val element = DocumentParser.parseElement("""
 [なろう:あらすじ]{
 これはあらすじです。
-}""")).getResult
+}""")
     assert(element.prefix == Some(Ast.Prefix.Narou))
     assert(element.name == "synopsis")
     assert(element.asInstanceOf[Ast.Synopsis].body == "これはあらすじです。")
   }
 
-  test("[カクヨム:あらすじ] is parsed") {
-    val elementParser: TutuParser[Ast.Element] = DocumentParser.element
-    val element = elementParser.parse(Input.of("""
+  test("[カクヨム:あらすじ] が解析可能") {
+    val element = DocumentParser.parseElement("""
 [カクヨム:あらすじ]{
 これはあらすじです。
-}""")).getResult
+}""")
     assert(element.prefix == Some(Ast.Prefix.Kakuyomu))
     assert(element.name == "synopsis")
     assert(element.asInstanceOf[Ast.Synopsis].body == "これはあらすじです。")
